@@ -35,7 +35,7 @@ jobs:
 
       - name: Push Docker image to ECR
         run: |
-          docker tag deployment-apps:latest 654654305297.dkr.ecr.ap-south-1.amazonaws.com/deployment-apps:v1.0
+          docker tag deployment-apps:v1.0 654654305297.dkr.ecr.ap-south-1.amazonaws.com/deployment-apps:v1.0
           docker push 654654305297.dkr.ecr.ap-south-1.amazonaws.com/deployment-apps:v1.0
 
       - name: Deploy to EKS
