@@ -1,0 +1,49 @@
+name: CI/CD for Flask App
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to main branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build Docker image
+        run: |
+          docker build -t deployment-apps:latest .
+
+      - name: Log in to AWS ECR
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 654654305297.dkr.ecr.ap-south-1.amazonaws.com
+
+      - name: Push Docker image to ECR
+        run: |
+          docker tag deployment-apps:latest 654654305297.dkr.ecr.ap-south-1.amazonaws.com/deployment-apps:latest
+          docker push 654654305297.dkr.ecr.ap-south-1.amazonaws.com/deployment-apps:latest
+
+      - name: Deploy to EKS
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws eks --region ap-south-1 update-kubeconfig --name your-cluster-name
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
+
