@@ -24,7 +24,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t deployment-apps:latest .
+          docker build -t deployment-apps:v1.0 .
 
       - name: Log in to AWS ECR
         env:
@@ -35,8 +35,8 @@ jobs:
 
       - name: Push Docker image to ECR
         run: |
-          docker tag deployment-apps:latest 654654305297.dkr.ecr.ap-south-1.amazonaws.com/deployment-apps:latest
-          docker push 654654305297.dkr.ecr.ap-south-1.amazonaws.com/deployment-apps:latest
+          docker tag deployment-apps:latest 654654305297.dkr.ecr.ap-south-1.amazonaws.com/deployment-apps:v1.0
+          docker push 654654305297.dkr.ecr.ap-south-1.amazonaws.com/deployment-apps:v1.0
 
       - name: Deploy to EKS
         env:
